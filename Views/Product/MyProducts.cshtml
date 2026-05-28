@@ -1,0 +1,170 @@
+@model List<AliersEcom.Models.Product>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers — Ürünlerim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+    <style>
+      .modal-overlay {
+        position: fixed; inset: 0; z-index: 999;
+        background: rgba(0,0,0,0.7);
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .modal-overlay.open { display: flex; }
+      .modal-box {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        max-width: 420px; width: 100%;
+        box-shadow: var(--shadow);
+      }
+      .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+      .modal-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+      .modal-actions { display: flex; gap: 10px; }
+    </style>
+    </head>
+    <body>
+        <div class="admin-layout">
+
+            <aside class="sidebar">
+                <div class="sidebar-logo">
+                    <a href="/" class="logo-text" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Aliers</a>
+                </div>
+                <nav class="sidebar-nav">
+                    <span class="sidebar-section">Researcher Panel</span>
+                    <a href="/Product/MyProducts" class="sidebar-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                        Ürünlerim
+                        <span class="sidebar-badge">@Model.Count</span>
+                    </a>
+                    <a href="/Product/Create" class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        Yeni Ürün Ekle
+                    </a>
+                    <a href="/" class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                        Ana Sayfa
+                    </a>
+                    <a href="/Account/Logout" class="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                        Çıkış Yap
+                    </a>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="sidebar-user">
+                        <div class="user-avatar">R</div>
+                        <div class="user-info">
+                            <div class="user-name">@User.Identity.Name</div>
+                            <div class="user-role">Researcher</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="admin-main">
+                <div class="admin-topbar">
+                    <div>
+                        <h1 class="page-title">Ürünlerim</h1>
+                        <p class="page-sub">Eklediğin ürünleri ve onay durumlarını görüntüle</p>
+                    </div>
+                    <div class="topbar-actions">
+                        <a href="/Product/Create" class="btn btn-primary">+ Yeni Ürün</a>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ürün Adı</th>
+                                    <th>Kategori</th>
+                                    <th>Fiyat</th>
+                                    <th>Eklenme Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px 0">
+                                            Henüz hiç ürün eklemediniz. <a href="/Product/Create" style="color:#a78bfa">İlk ürünü ekle</a>
+                                        </td>
+                                    </tr>
+                                }
+                                @foreach (var p in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@p.Name</strong></td>
+                                        <td>@p.Category</td>
+                                        <td>$@p.SupplierPrice</td>
+                                        <td>@p.CreatedAt.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            @if (p.IsApproved)
+                                            {
+                                                <span class="status-badge approved">Onaylandı</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge pending">Admin Onayı Bekleniyor</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="table-actions">
+                                                @if (!p.IsApproved)
+                                                {
+                                                    <button class="action-btn reject" onclick="silOnayGoster('@p.Id', '@p.Name')">Sil</button>
+                                                }
+                                                else
+                                                {
+                                                    <span style="font-size:12px;color:var(--text-dim)">Yayında</span>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="modal-overlay" id="silModal">
+          <div class="modal-box">
+            <div class="modal-title">Ürünü Sil</div>
+            <p class="modal-desc" id="silModalDesc"></p>
+            <div class="modal-actions">
+              <a id="silModalBtn" href="" class="btn btn-danger">Evet, Sil</a>
+              <button onclick="modalKapat()" class="btn btn-ghost">İptal</button>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          function silOnayGoster(id, isim) {
+            document.getElementById('silModalDesc').textContent = '"' + isim + '" ürününü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.';
+            document.getElementById('silModalBtn').href = '/Product/MyDelete/' + id;
+            document.getElementById('silModal').classList.add('open');
+          }
+
+          function modalKapat() {
+            document.getElementById('silModal').classList.remove('open');
+          }
+
+          document.getElementById('silModal').addEventListener('click', function(e) {
+            if (e.target === this) modalKapat();
+          });
+        </script>
+    </body>
+</html>

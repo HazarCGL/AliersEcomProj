@@ -1,0 +1,170 @@
+@model List<AliersEcom.Controllers.UserViewModel>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers — Kullanıcı Yönetimi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+    <style>
+      .modal-overlay {
+        position: fixed; inset: 0; z-index: 999;
+        background: rgba(0,0,0,0.7);
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .modal-overlay.open { display: flex; }
+      .modal-box {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        max-width: 420px; width: 100%;
+        box-shadow: var(--shadow);
+      }
+      .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+      .modal-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+      .modal-actions { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="/" class="logo-text" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Aliers</a>
+            </div>
+            <nav class="sidebar-nav">
+                <span class="sidebar-section">Yönetim</span>
+                <a href="/Product/AdminList" class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                    Ürün Onayları
+                </a>
+                <a href="/Admin/Users" class="sidebar-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    Kullanıcılar
+                </a>
+                <a href="/Account/Logout" class="sidebar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                    Çıkış Yap
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">@User.Identity.Name</div>
+                        <div class="user-role">Admin</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <div class="admin-topbar">
+                <div>
+                    <h1 class="page-title">Kullanıcı Yönetimi</h1>
+                    <p class="page-sub">Tüm kullanıcıları görüntüle, rol değiştir veya banla</p>
+                </div>
+                <div class="topbar-actions">
+                    <input type="text" class="table-search" id="kullaniciArama" placeholder="Kullanıcı ara..." oninput="kullaniciFiltirele()">
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>Kullanıcı Adı</th>
+                                <th>E-posta</th>
+                                <th>Rol</th>
+                                <th>Kayıt Tarihi</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kullaniciTablosu">
+                            @foreach (var user in Model)
+                            {
+                                <tr>
+                                    <td style="font-size:11px;color:var(--text-dim);font-family:monospace">@user.Id.Substring(0, 8)...</td>
+                                    <td><strong>@user.UserName</strong></td>
+                                    <td>@user.Email</td>
+                                    <td>
+                                        <span class="role-badge @user.Role.ToLower()">@user.Role</span>
+                                    </td>
+                                    <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        @if (user.IsBanned)
+                                        {
+                                            <span class="status-badge banned">Banlı</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge active">Aktif</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="/Admin/UserDetail/@user.Id" class="action-btn">Detay</a>
+                                            @if (user.IsBanned)
+                                            {
+                                                <a href="/Admin/Unban/@user.Id" class="action-btn approve">Ban Kaldır</a>
+                                            }
+                                            else
+                                            {
+                                                <button class="action-btn reject" onclick="banOnayGoster('@user.Id', '@user.UserName')">Banla</button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="banModal">
+      <div class="modal-box">
+        <div class="modal-title">Kullanıcıyı Banla</div>
+        <p class="modal-desc" id="banModalDesc"></p>
+        <div class="modal-actions">
+          <a id="banModalBtn" href="" class="btn btn-danger">Evet, Banla</a>
+          <button onclick="modalKapat()" class="btn btn-ghost">İptal</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        function kullaniciFiltirele() {
+            var q = document.getElementById('kullaniciArama').value.toLowerCase();
+            var satirlar = document.querySelectorAll('#kullaniciTablosu tr');
+            satirlar.forEach(function(satir) {
+                satir.style.display = satir.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function banOnayGoster(id, kullaniciAdi) {
+            document.getElementById('banModalDesc').textContent = '"' + kullaniciAdi + '" kullanıcısını banlamak istediğinizden emin misiniz? Kullanıcı sisteme giriş yapamayacak.';
+            document.getElementById('banModalBtn').href = '/Admin/Ban/' + id;
+            document.getElementById('banModal').classList.add('open');
+        }
+
+        function modalKapat() {
+            document.getElementById('banModal').classList.remove('open');
+        }
+
+        document.getElementById('banModal').addEventListener('click', function(e) {
+            if (e.target === this) modalKapat();
+        });
+    </script>
+</body>
+</html>

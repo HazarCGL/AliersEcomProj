@@ -1,0 +1,301 @@
+@model List<AliersEcom.Models.Product>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers — Ürün Araştırma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="logo">
+            <span class="logo-text">Aliers</span>
+            <span class="logo-dot"></span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">Ürünler</a>
+            <a href="#kategoriler" class="nav-link">Kategoriler</a>
+        </div>
+        <div class="nav-actions">
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <div style="display:flex;align-items:center;gap:24px">
+
+                    <div class="user-dropdown-wrap">
+                            <button class="notif-btn" onclick="toggleNotif(event)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#f0f0f0" stroke-width="2" width="18" height="18" class="notif-icon">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            @if (ViewBag.UnreadCount != null && (int)ViewBag.UnreadCount > 0)
+                            {
+                                <span style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center">@ViewBag.UnreadCount</span>
+                            }
+                        </button>
+                        <div class="user-dropdown-menu" id="notifMenu" style="min-width:320px;right:0">
+                            <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:14px;font-weight:700">
+                                Bildirimler
+                            </div>
+                            @if (ViewBag.Notifications != null && ((List<AliersEcom.Models.Notification>)ViewBag.Notifications).Count > 0)
+                            {
+                                foreach (var n in (List<AliersEcom.Models.Notification>)ViewBag.Notifications)
+                                {
+                                    <div class="dropdown-item" style="flex-direction:column;align-items:flex-start;gap:4px;padding:12px 16px;cursor:default">
+                                        <div style="display:flex;align-items:center;gap:8px;width:100%">
+                                            <span style="font-size:18px">@n.Icon</span>
+                                            <span style="font-size:13px;font-weight:600;color:var(--text)">@n.Title</span>
+                                            <span style="margin-left:auto;font-size:11px;color:var(--text-dim)">@n.CreatedAt.ToString("dd MMM")</span>
+                                        </div>
+                                        <p style="font-size:12px;color:var(--text-muted);line-height:1.5;padding-left:26px;margin:0">@n.Message</p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div style="padding:32px 16px;text-align:center;color:var(--text-muted);font-size:14px">
+                                    Henüz bildirim yok 🔔
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="user-dropdown-wrap">
+                        <button class="user-dropdown-btn" onclick="toggleDropdown(event)">
+                            <div class="user-avatar" style="width:28px;height:28px;font-size:12px;display:inline-flex">
+                                @User.Identity.Name.Substring(0, 1).ToUpper()
+                            </div>
+                            <span style="font-size:14px;color:var(--text)">@User.Identity.Name</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--text-muted)">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+                        <div class="user-dropdown-menu" id="dropdownMenu">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a href="/Product/Create" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                                    Ürün Ekle
+                                </a>
+                                <a href="/Product/AdminList" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                                    Ürün Onayları
+                                </a>
+                                <a href="/Admin/Users" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                                    Üye İşlemleri
+                                </a>
+                                <a href="/Favorite/Index" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+                                    Favorilerim
+                                </a>
+                            }
+                            @if (User.IsInRole("Researcher"))
+                            {
+                                <a href="/Product/Create" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                                    Ürün Ekle
+                                </a>
+                                <a href="/Product/MyProducts" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
+                                    Ürünlerim
+                                </a>
+                                <a href="/Favorite/Index" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+                                    Favorilerim
+                                </a>
+                            }
+                            @if (User.IsInRole("User"))
+                            {
+                                <a href="/Favorite/Index" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+                                    Favorilerim
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
+                                    Planımı Yönet
+                                </a>
+                            }
+                            <div class="dropdown-divider"></div>
+                            <a href="/Account/Logout" class="dropdown-item dropdown-item-danger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                                Çıkış Yap
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <a href="/Account/Login" class="btn btn-ghost">Giriş Yap</a>
+                <a href="/Account/Register" class="btn btn-primary">Üye Ol</a>
+            }
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+        <div class="hero-badge">🔥 Dropshipping Araştırma Platformu</div>
+        <h1 class="hero-title">
+            Kazanan Ürünleri<br>
+            <span class="gradient-text">Keşfet</span>
+        </h1>
+        <p class="hero-sub">
+            E-ticaret ve dropshipping yapanlar için araştırılmış, onaylanmış ürünleri filtrele.
+        </p>
+        <form method="get" action="/" class="search-bar">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" name="search" placeholder="Ürün ara..." class="search-input" id="urunAramaInput" value="@ViewBag.Search">
+            <button type="submit" class="btn btn-primary search-btn">Ara</button>
+        </form>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-num">@Model.Count</span>
+                <span class="stat-label">Ürün</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="filters-section" id="kategoriler">
+    <div class="container">
+        <div class="filters-row">
+            <div class="filter-chips">
+                <a href="/" class="chip @(string.IsNullOrEmpty(ViewBag.Category as string) ? "active" : "")">Tümü</a>
+                @if (ViewBag.Categories != null)
+                {
+                    foreach (var cat in ViewBag.Categories as List<string>)
+                    {
+                        <a href="/?category=@cat" class="chip @(ViewBag.Category == cat ? "active" : "")">@cat</a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Ürünler</h2>
+            <span class="section-count" id="gorunenUrunSayaci">@Model.Count ürün</span>
+        </div>
+
+        <div class="products-grid">
+            @if (Model.Count == 0)
+            {
+                <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0">
+                    Henüz onaylanmış ürün yok.
+                </p>
+            }
+            @foreach (var product in Model)
+            {
+                <article class="product-card">
+                    <div class="card-img-wrap">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" alt="@product.Name" style="width:100%;height:100%;object-fit:cover;">
+                        }
+                        else
+                        {
+                            <div class="placeholder-img" style="background:linear-gradient(135deg,#1a1a2e,#16213e);width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                                <div class="placeholder-icon">📦</div>
+                            </div>
+                        }
+                        <span class="card-badge new">@product.Category</span>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var favList = ViewBag.FavoriteIds as List<int> ?? new List<int>();
+                            var isFav = favList.Contains(product.Id);
+                            <a href="/Favorite/Add?productId=@product.Id" class="card-save" title="@(isFav ? "Favorilerden çıkar" : "Favorilere ekle")">
+                                <svg viewBox="0 0 24 24" fill="@(isFav ? "#f87171" : "none")" stroke="@(isFav ? "#f87171" : "currentColor")" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                            </a>
+                        }
+                    </div>
+                    <div class="card-body">
+                        <div class="card-tags">
+                            @foreach (var tag in product.Tags.Split(','))
+                            {
+                                <span class="tag">@tag.Trim()</span>
+                            }
+                        </div>
+                        <h3 class="card-title">@product.Name</h3>
+                        <p class="card-desc">@product.Description</p>
+                        <div class="card-footer">
+                            <div class="card-price">
+                                <span class="price-label">Tedarikçi Fiyatı</span>
+                                <span class="price">$@product.SupplierPrice</span>
+                            </div>
+                            <a href="/Product/Detail/@product.Id" class="btn btn-sm btn-primary">İncele</a>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="logo-text">Aliers</span>
+                <p>Dropshipping araştırmacıları için güvenilir ürün keşif platformu.</p>
+            </div>
+            <div class="footer-links">
+                <span class="footer-col-title">Hesap</span>
+                <a href="/Account/Login">Giriş Yap</a>
+                <a href="/Account/Register">Üye Ol</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2025 Aliers. Tüm hakları saklıdır.</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    var aktifMenu = null;
+
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        var menu = document.getElementById('dropdownMenu');
+        var notif = document.getElementById('notifMenu');
+        notif.classList.remove('open');
+        menu.classList.toggle('open');
+        aktifMenu = menu.classList.contains('open') ? menu : null;
+    }
+
+    function toggleNotif(e) {
+        e.stopPropagation();
+        var menu = document.getElementById('notifMenu');
+        var dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('open');
+        menu.classList.toggle('open');
+        aktifMenu = menu.classList.contains('open') ? menu : null;
+    }
+
+    document.addEventListener('click', function() {
+        if (aktifMenu) {
+            aktifMenu.classList.remove('open');
+            aktifMenu = null;
+        }
+    });
+</script>
+</body>
+</html>

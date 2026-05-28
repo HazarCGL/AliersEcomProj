@@ -1,0 +1,106 @@
+﻿@model AliersEcom.Models.Product
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers — @Model.Name</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-text">Aliers</span>
+                <span class="logo-dot"></span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Ana Sayfa</a>
+            </div>
+            <div class="nav-actions">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a href="/Account/Logout" class="btn btn-ghost">Çıkış</a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="btn btn-ghost">Giriş Yap</a>
+                    <a href="/Account/Register" class="btn btn-primary">Üye Ol</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <section style="padding:120px 24px 80px">
+        <div class="container">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start">
+
+                <!-- Görsel -->
+                <div>
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border);object-fit:cover;max-height:400px">
+                    }
+                    else
+                    {
+                        <div style="width:100%;height:350px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--radius-lg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:80px">
+                            📦
+                        </div>
+                    }
+                </div>
+
+                <!-- Detaylar -->
+                <div>
+                    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+                        <span class="tag">@Model.Category</span>
+                        @foreach (var tag in Model.Tags.Split(','))
+                        {
+                            <span class="tag">@tag.Trim()</span>
+                        }
+                    </div>
+
+                    <h1 style="font-family:var(--font-head);font-size:32px;font-weight:800;line-height:1.2;margin-bottom:16px">@Model.Name</h1>
+
+                    <p style="color:var(--text-muted);font-size:16px;line-height:1.7;margin-bottom:28px">@Model.Description</p>
+
+                    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px">
+                        <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Tedarikçi Fiyatı</div>
+                        <div style="font-family:var(--font-head);font-size:36px;font-weight:800;color:#60a5fa">$@Model.SupplierPrice</div>
+                    </div>
+
+                    <div style="display:flex;gap:12px;flex-wrap:wrap">
+                        @if (!string.IsNullOrEmpty(Model.SupplierLink))
+                        {
+                            <a href="@Model.SupplierLink" target="_blank" class="btn btn-primary btn-lg">
+                                Tedarikçiye Git →
+                            </a>
+                        }
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <a href="/Favorite/Add/@Model.Id" class="btn btn-ghost btn-lg">
+                                ♡ Favorilere Ekle
+                            </a>
+                        }
+                    </div>
+
+                    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border)">
+                        <div style="font-size:13px;color:var(--text-dim)">
+                            Eklenme tarihi: @Model.CreatedAt.ToString("dd MMMM yyyy")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:48px">
+                <a href="/" style="color:#a78bfa;font-size:14px">← Ürünlere geri dön</a>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

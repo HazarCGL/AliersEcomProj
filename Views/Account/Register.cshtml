@@ -1,0 +1,56 @@
+﻿@{
+    Layout = null;
+    string serverErr = ViewBag.Error as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+    </head>
+    <body>
+        <div class="auth-grid"></div>
+        <div class="auth-glow"></div>
+        <div class="auth-page">
+            <div class="auth-card" style="max-width:500px">
+                <div class="auth-logo">
+                    <a href="/" class="logo-text">Aliers</a>
+                </div>
+                <h1 class="auth-title">Hesap Oluştur</h1>
+                <p class="auth-sub">Ücretsiz kaydol.</p>
+
+                <div id="regErrMsg" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:14px;"></div>
+
+                @if (!string.IsNullOrEmpty(serverErr))
+                {
+                    <div style="color:#f87171;padding:10px;margin-bottom:16px;">@serverErr</div>
+                }
+
+                <form method="post" action="/Account/Register">
+                    <div class="form-group">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" name="fullName" class="form-input" id="memberFirstName" placeholder="Adınız" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" name="email" class="form-input" id="memberEmail" placeholder="ornek@mail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" name="password" class="form-input" id="memberPwd" placeholder="En az 6 karakter" required>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary btn-full btn-lg">Hesap Oluştur</button>
+                    </div>
+                </form>
+
+                <div class="auth-switch" style="margin-top:16px">
+                    Hesabınız var mı? <a href="/Account/Login">Giriş yap</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

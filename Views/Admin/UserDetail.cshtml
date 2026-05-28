@@ -1,0 +1,229 @@
+@model AliersEcom.Controllers.UserViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aliers — Kullanıcı Detay</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="~/css/style.css">
+<style>
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,0.7);
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    max-width: 420px; width: 100%;
+    box-shadow: var(--shadow);
+  }
+  .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .modal-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo-text" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Aliers</a>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Yönetim</span>
+      <a href="/Product/AdminList" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Ürün Onayları
+      </a>
+      <a href="/Admin/Users" class="sidebar-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Kullanıcılar
+      </a>
+      <a href="/Account/Logout" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Çıkış Yap
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name">@User.Identity.Name</div>
+          <div class="user-role">Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1 class="page-title">Kullanıcı Detay</h1>
+        <p class="page-sub">Hesap bilgileri ve işlemler</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="/Admin/Users" class="btn btn-ghost">← Geri Dön</a>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+
+      <div class="table-wrap" style="padding:24px">
+        <h2 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:20px">Hesap Bilgileri</h2>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Account ID</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--text-dim)">@Model.Id</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Ad Soyad</span>
+            <span style="font-size:14px;font-weight:600">@Model.FullName</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Kullanıcı Adı</span>
+            <span style="font-size:14px">@Model.UserName</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">E-posta</span>
+            <span style="font-size:14px">@Model.Email</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Kayıt Tarihi</span>
+            <span style="font-size:14px">@Model.CreatedAt.ToString("dd MMMM yyyy")</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Mevcut Rol</span>
+            <span class="role-badge @Model.Role.ToLower()">@Model.Role</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text-muted);font-size:13px">Durum</span>
+            @if (Model.IsBanned)
+            {
+                <span class="status-badge banned">Banlı</span>
+            }
+            else
+            {
+                <span class="status-badge active">Aktif</span>
+            }
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--text-muted);font-size:13px">Eklenen Ürün</span>
+            <span style="font-size:14px;font-weight:600;color:#60a5fa">@Model.ProductCount ürün</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div class="table-wrap" style="padding:24px">
+          <h2 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:16px">Rol Değiştir</h2>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button onclick="rolOnayGoster('User')" class="btn btn-outline" style="justify-content:flex-start;gap:10px;@(Model.Role == "User" ? "border-color:var(--accent);color:var(--accent)" : "")">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              User
+              @if (Model.Role == "User") { <span style="margin-left:auto;font-size:11px;opacity:.7">Mevcut</span> }
+            </button>
+            <button onclick="rolOnayGoster('Researcher')" class="btn btn-outline" style="justify-content:flex-start;gap:10px;@(Model.Role == "Researcher" ? "border-color:var(--accent);color:var(--accent)" : "")">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Researcher
+              @if (Model.Role == "Researcher") { <span style="margin-left:auto;font-size:11px;opacity:.7">Mevcut</span> }
+            </button>
+            <button onclick="rolOnayGoster('Admin')" class="btn btn-outline" style="justify-content:flex-start;gap:10px;@(Model.Role == "Admin" ? "border-color:var(--accent);color:var(--accent)" : "")">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Admin
+              @if (Model.Role == "Admin") { <span style="margin-left:auto;font-size:11px;opacity:.7">Mevcut</span> }
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="padding:24px">
+          <h2 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:16px">Hesap İşlemi</h2>
+          @if (Model.IsBanned)
+          {
+              <button onclick="banOnayGoster('kaldir')" class="btn btn-success btn-full">Banı Kaldır</button>
+          }
+          else
+          {
+              <button onclick="banOnayGoster('banla')" class="btn btn-danger btn-full">Hesabı Banla</button>
+          }
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="rolModal">
+  <div class="modal-box">
+    <div class="modal-title">Rol Değişikliği Onayı</div>
+    <p class="modal-desc" id="rolModalDesc"></p>
+    <div class="modal-actions">
+      <form method="post" id="rolForm" action="">
+        <button type="submit" class="btn btn-primary">Onayla</button>
+      </form>
+      <button onclick="modalKapat('rolModal')" class="btn btn-ghost">İptal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="banModal">
+  <div class="modal-box">
+    <div class="modal-title" id="banModalTitle"></div>
+    <p class="modal-desc" id="banModalDesc"></p>
+    <div class="modal-actions">
+      <a id="banModalBtn" href="" class="btn btn-danger">Onayla</a>
+      <button onclick="modalKapat('banModal')" class="btn btn-ghost">İptal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var userId = '@Model.Id';
+  var mevcutRol = '@Model.Role';
+
+  function rolOnayGoster(yeniRol) {
+    if (yeniRol === mevcutRol) return;
+    document.getElementById('rolModalDesc').textContent =
+      mevcutRol + ' rolündeki bu kullanıcının rolünü ' + yeniRol + ' olarak değiştirmek istediğinizden emin misiniz?';
+    document.getElementById('rolForm').action = '/Admin/ChangeRole/' + userId + '/' + yeniRol;
+    document.getElementById('rolModal').classList.add('open');
+  }
+
+  function banOnayGoster(tip) {
+    var modal = document.getElementById('banModal');
+    var btn = document.getElementById('banModalBtn');
+    if (tip === 'banla') {
+      document.getElementById('banModalTitle').textContent = 'Hesabı Banla';
+      document.getElementById('banModalDesc').textContent = 'Bu kullanıcının hesabını banlamak istediğinizden emin misiniz? Kullanıcı sisteme giriş yapamayacak.';
+      btn.href = '/Admin/Ban/' + userId;
+      btn.className = 'btn btn-danger';
+    } else {
+      document.getElementById('banModalTitle').textContent = 'Banı Kaldır';
+      document.getElementById('banModalDesc').textContent = 'Bu kullanıcının banını kaldırmak ve hesabını aktif etmek istediğinizden emin misiniz?';
+      btn.href = '/Admin/Unban/' + userId;
+      btn.className = 'btn btn-success';
+    }
+    modal.classList.add('open');
+  }
+
+  function modalKapat(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>

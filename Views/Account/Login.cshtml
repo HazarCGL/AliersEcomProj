@@ -1,0 +1,88 @@
+﻿@{
+    Layout = null;
+    string serverErr = ViewBag.Error as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aliers — Giris Yap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/style.css">
+    </head>
+    <body>
+        <div class="auth-grid"></div>
+        <div class="auth-glow"></div>
+        <div class="auth-page">
+            <div class="auth-card">
+                <div class="auth-logo">
+                    <a href="/" class="logo-text">Aliers</a>
+                </div>
+                <h1 class="auth-title">Tekrar hoş geldin</h1>
+                <p class="auth-sub">Hesabına giriş yap ve ürünleri keşfetmeye devam et.</p>
+
+                @if (TempData["LoginRequired"] != null)
+                {
+                    <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#a78bfa;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:14px;">
+                        @TempData["LoginRequired"]
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(serverErr))
+                {
+                    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:14px;">
+                        @serverErr
+                    </div>
+                }
+
+                <form method="post" action="/Account/Login">
+                    <div class="form-group">
+                        <label class="form-label">E-posta Adresi</label>
+                        <input type="email" name="email" class="form-input" id="girisEposta" placeholder="ornek@mail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Şifre</label>
+                        <div class="input-wrap">
+                            <input type="password" name="password" class="form-input" id="girisSifre" placeholder="••••••••" required>
+                            <button type="button" class="input-icon" id="sifreToggleBtn" onclick="girisSifresiToggle()">
+                                <svg id="gozAcikIkon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg id="gozKapaliIkon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" id="beniHatirla" checked>
+                            <label for="beniHatirla">Beni hatırla</label>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary btn-full btn-lg">Giriş Yap</button>
+                    </div>
+                </form>
+
+                <div class="auth-divider">veya</div>
+                <div class="auth-switch">
+                    Hesabın yok mu? <a href="/Account/Register">Ücretsiz üye ol</a>
+                </div>
+            </div>
+        </div>
+        <script>
+                function girisSifresiToggle() {
+                  var sifreKutusu = document.getElementById('girisSifre');
+                  var sifreGizli = sifreKutusu.type === 'password';
+                  sifreKutusu.type = sifreGizli ? 'text' : 'password';
+                  document.getElementById('gozAcikIkon').style.display = sifreGizli ? 'none' : '';
+                  document.getElementById('gozKapaliIkon').style.display = sifreGizli ? '' : 'none';
+                }
+        </script>
+    </body>
+</html>
